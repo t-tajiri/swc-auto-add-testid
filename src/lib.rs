@@ -1,17 +1,22 @@
-use swc_core::{ecma::{
-    ast::{Program, JSXOpeningElement, JSXAttrOrSpread, JSXAttr, JSXAttrName, JSXAttrValue, Lit, Str},
-    transforms::base::perf::Parallel,
-    visit::{as_folder, FoldWith, VisitMut, noop_visit_mut_type}, utils::quote_ident,
-}, common::DUMMY_SP};
 use swc_core::plugin::{plugin_transform, proxies::TransformPluginProgramMetadata};
+use swc_core::{
+    common::DUMMY_SP,
+    ecma::{
+        ast::{
+            JSXAttr, JSXAttrName, JSXAttrOrSpread, JSXAttrValue, JSXOpeningElement, Lit, Program,
+            Str,
+        },
+        transforms::base::perf::Parallel,
+        utils::quote_ident,
+        visit::{as_folder, noop_visit_mut_type, FoldWith, VisitMut},
+    },
+};
 
 #[cfg(test)]
 mod tests;
 
-
 #[derive(Clone, Copy)]
-struct AutoAddTestId {
-}
+struct AutoAddTestId {}
 
 // execute parallelly
 impl Parallel for AutoAddTestId {
@@ -19,7 +24,7 @@ impl Parallel for AutoAddTestId {
         *self
     }
 
-    fn merge(&mut self, _:Self) {}
+    fn merge(&mut self, _: Self) {}
 }
 
 impl VisitMut for AutoAddTestId {
@@ -35,10 +40,9 @@ impl VisitMut for AutoAddTestId {
             value: Some(JSXAttrValue::Lit(Lit::Str(Str {
                 span: DUMMY_SP,
                 value: "first_attempt".into(),
-                raw: None
-            })))
-        })
-        )
+                raw: None,
+            }))),
+        }))
     }
 }
 
