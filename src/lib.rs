@@ -1,10 +1,12 @@
 use swc_core::{ecma::{
     ast::{Program, JSXOpeningElement, JSXAttrOrSpread, JSXAttr, JSXAttrName, JSXAttrValue, Lit, Str},
-    transforms::{testing::test, base::perf::Parallel},
+    transforms::base::perf::Parallel,
     visit::{as_folder, FoldWith, VisitMut, noop_visit_mut_type}, utils::quote_ident,
-    parser::{Syntax, EsConfig}
 }, common::DUMMY_SP};
 use swc_core::plugin::{plugin_transform, proxies::TransformPluginProgramMetadata};
+
+#[cfg(test)]
+mod tests;
 
 
 #[derive(Clone, Copy)]
@@ -59,17 +61,3 @@ impl VisitMut for AutoAddTestId {
 pub fn process_transform(program: Program, _metadata: TransformPluginProgramMetadata) -> Program {
     program.fold_with(&mut as_folder(AutoAddTestId {}))
 }
-
-// An example to test plugin transform.
-// Recommended strategy to test plugin's transform is verify
-// the Visitor's behavior, instead of trying to run `process_transform` with mocks
-// unless explicitly required to do so.
-test!(
-    Syntax::Es(EsConfig { jsx: true, ..Default::default() }),
-    |_| as_folder(AutoAddTestId {}),
-    first,
-    // Input codes
-    r#"var x = <div>test</div>"#,
-    // Output codes after transformed with plugin
-    r#"var x = <div data-testid="first_attempt">test</div>;"#
-);
